@@ -58,16 +58,7 @@ class JacobiSolver(Solver):
         return rounded_number
 
     def round_matrix_to_sf(self, matrix, sf):
-        """
-        Round a NumPy matrix to a specified number of significant figures.
-
-        Parameters:
-        - matrix: The input matrix to be rounded.
-        - sf: The desired number of significant figures.
-
-        Returns:
-        - rounded_matrix: The matrix rounded to the specified significant figures.
-        """
+      
         rounded_matrix = np.vectorize(
             lambda x: self.round_to_sf(x, sf))(matrix)
         return rounded_matrix
