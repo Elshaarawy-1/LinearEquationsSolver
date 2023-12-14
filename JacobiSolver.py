@@ -75,5 +75,5 @@ class JacobiSolver(Solver):
     def matrixSumofProduct(self, v1, v2, itr):
         sum = 0
         for i in range(len(v1)):
-            sum += self.round_to_sf(v1[itr, i] * v2[i], self.sf)
+            sum = self.round_to_sf(sum + self.round_to_sf(v1[itr, i] * v2[i], self.sf), self.sf)
         return sum
