@@ -1,3 +1,4 @@
+from Round_SF import round_to_sf
 import Solver
 import numpy as np
 
@@ -37,7 +38,7 @@ class JacobiSolver(Solver):
             for itr in range(len(self.x)):
                 # dot_product = round_to_sf(sum(round_to_sf(R[itr, j] * x_old[j],sf) for j in range(len(x_old))),sf)
                 dot_product = self.matrixSumofProduct(R, x_old, itr)
-                self.x[itr] = self.round_to_sf((self.round_to_sf((b[itr] - dot_product), self.sf) / D[itr]), self.sf) # calculate the new x
+                self.x[itr] = round_to_sf((round_to_sf((b[itr] - dot_product), self.sf) / D[itr]), self.sf) # calculate the new x
                 abs_rel_error = np.abs((self.x[itr] - x_old[itr]) / self.x[itr])  # calculate the absolute relative error for each x
                 print(
                     f"x{itr} = {self.x[itr]} and Absolute relative error: {abs_rel_error}") # print the new x and the absolute relative error
@@ -48,23 +49,8 @@ class JacobiSolver(Solver):
         return self.x
         pass
 
-    def round_to_sf(self, number, sf):
-        if number == 0:
-            return 0
-        order_of_magnitude = 10 ** (sf -
-                                    int(np.floor(np.log10(abs(number)))) - 1)
-        rounded_number = round(
-            number * order_of_magnitude) / order_of_magnitude
-        return rounded_number
-
-    def round_matrix_to_sf(self, matrix, sf):
-      
-        rounded_matrix = np.vectorize(
-            lambda x: self.round_to_sf(x, sf))(matrix)
-        return rounded_matrix
-
     def matrixSumofProduct(self, v1, v2, itr):
         sum = 0
         for i in range(len(v1)):
-            sum = self.round_to_sf(sum + self.round_to_sf(v1[itr, i] * v2[i], self.sf), self.sf)
+            sum = round_to_sf(sum + round_to_sf(v1[itr, i] * v2[i], self.sf), self.sf)
         return sum
