@@ -7,9 +7,10 @@ from GaussSeidelSolver import GaussSeidelSolver
 class Solver:
     def __init__(self, eqns):
         self._coefficients = eqns
+        
 
     def solve(self, method):
-        my_solver = self._get_solver(method)
+        my_solver = self.get_solver(method)
         if my_solver is None:
             raise ValueError(f"Invalid solver method: {method}")
         return my_solver.solve()

@@ -11,60 +11,14 @@ class LU_Solver(Solver):
         self.L = None
         self.U = None
 
-    def solve(self, b):
+    def solve(self, b, decomposition):
         self.b = b
-        self.doolittle_decomposition()
+        self.L, self.U = decomposition.decompose()
         self.solveForLower()
         self.solveForUpper()
         return self.b
 
-    def crout(self, single_step=False):
-        # N = len(a[0])
-        self.L = zeros(self.N, self.N)
-        self.U = zeros(self.N, self.N)
-
-        for i in range(self.N):
-            self.L[i, 0] = self.A[i, 0]
-            self.U[i, i] = 1
-
-        if self.L[0,0] == 0:
-            print("Can't Divide By Zero A[1][1]")
-            raise ValueError("Can't divide by zero")
-        
-        for j in range(1, self.N):
-            self.U[0, j] = self.A[0, j] / self.L[0, 0]
-
-        for i in range(1, self.N):
-            for j in range(1, i + 1):
-                sum_val = sum(self.L[i, k] * self.U[k, j] for k in range(j))
-
-                self.L[i, j] = self.A[i, j] - sum_val
-                # self.L[i, j] = self.A[i, j] - np.dot(self.L[i, 0:j], self.U[0:j, j])
-
-
-            if self.L[i,i] == 0:
-                print(f"Can't Divide By Zero L[{i+1}][{i+1}]")
-                raise ValueError("Can't divide by zero")
-            for j in range(i + 1, self.N):
-                sum_val = sum(self.L[i, k] * self.U[k, j] for k in range(i))
-                self.U = (self.A[i, j] - sum_val) / self.L[i, i]
-                # self.U[i, j] = (self.A[i, j] - np.dot(self.L[i, 0:i], self.U[0:i, j])) / self.L[i, i]
-
-            print("Step:", i)
-            print("L:")
-            print(self.L)
-            print("\nU:")
-            print(self.U)
-            print("\n-------------------------")
-
-            if single_step and i < self.N - 1:
-                input("Press Enter to go to the next step...")
-
-        print("Final L:")
-        print(self.L)
-        print("\nFinal U:")
-        print(self.U)
-
+    
 
     
     
@@ -138,18 +92,18 @@ class LU_Solver(Solver):
 
 
 
-# Example usage:
+# # Example usage:
     
-# A = matrix([[2, -1, 1], [-3, -1, 2], [-2, 1, 2]])
-# A = matrix([[3, -0.1, -0.2],
-#             [0.1, 7, -0.3],
-#             [0.3, -0.2, 10]])
-A = matrix([[-8, 1, -2],
-            [-3, -1, 7],
-            [2, -6, 1]])
+# # A = matrix([[2, -1, 1], [-3, -1, 2], [-2, 1, 2]])
+# # A = matrix([[3, -0.1, -0.2],
+# #             [0.1, 7, -0.3],
+# #             [0.3, -0.2, 10]])
+# A = matrix([[-8, 1, -2],
+#             [-3, -1, 7],
+#             [2, -6, 1]])
 
 
-b = matrix([106.8, 177.2, 279.2])
-lu_solver = LU_Solver(A)
-result = lu_solver.solve(b)
-print(result)
+# b = matrix([106.8, 177.2, 279.2])
+# lu_solver = LU_Solver(A)
+# result = lu_solver.solve(b)
+# print(result)
