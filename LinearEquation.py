@@ -1,8 +1,8 @@
-from Parser_NoLetter import Parser
-from Parser_Letter import Parser_Letter
+from parser.Parser_NoLetter import Parser
+from parser.Parser_Letter import Parser_Letter
 from JacobiSolver import JacobiSolver
 from LU_Solver import *
-from EquationSystem import *
+from parser.EquationSystem import *
 import numpy as np
 from mpmath import mp
 from GaussSeidelSolver import *
@@ -24,10 +24,10 @@ if (noLetter): # True if no_letter mode
     parser=Parser()
     system_of_equations = parser.parseEquations(list_equation)
     if (jacobi):
-        jacobi_solver = JacobiSolver(system_of_equations.A,system_of_equations.b,itr=50,tolerance=1e-10,x=[1,1,1],Sf=5)
+        jacobi_solver = JacobiSolver(system_of_equations.A,system_of_equations.B,itr=50,tolerance=1e-10,x=[1,1,1],Sf=5)
         print(jacobi_solver.solve())
     if (lu_decomposition):
-        LU_Solver = LUSolverBase(system_of_equations.A,system_of_equations.b)
+        LU_Solver = LUSolverBase(system_of_equations.A,system_of_equations.B)
         if (doolittle):
             doolittle_solver=LUDoolittleSolver(LU_Solver)
             steps=doolittle_solver.solve()

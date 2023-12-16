@@ -1,10 +1,10 @@
 
 import dearpygui.dearpygui as dpg
 from gui.logger import CustomLogger
-from LU_Solver import LU_Solver
-from ali_hassan_GaussEliminationSolver import GaussEliminationSolver
-from Parser_NoLetter import Parser
+from parser.parser_noletter import Parser
 from mpmath import mp
+from solvers.solver import Solver
+from solvers.solver_factory import SolverFactory
 
 class SolverGUI:
     def __init__(self) -> None:
@@ -116,23 +116,20 @@ class SolverGUI:
     def solve_cb(self,sender,app_data):
         # get current value of equations text and split on newline
         equations = dpg.get_value("equations").split("\n")
+        
         # remove empty lines
         equations = [eqn for eqn in equations if eqn != ""]
 
-        # get current value of method combo
         method = dpg.get_value("method")
-        
-        # get current value of scaling checkbox
         scaling = dpg.get_value("scaling")
-        
-        # get current value of precision slider
         precision = dpg.get_value("precision")
         
         mp.dps = precision
         
         parser = Parser()
         system_of_equations=parser.parseEquations(equations)
-        solver = GaussEliminationSolver(system_of_equations.A,system_of_equations.B)
+        
+        solver = SolverFactory(system_of_equations.A, system_of_equations.B).get_solver(method)
         sol = solver.solve()
         
         i = 0
@@ -143,6 +140,8 @@ class SolverGUI:
             
         dpg.set_value("solution_text", text)
         
+        
+        self.steps.clear_log()
         for step in solver.steps:
             self.steps.log(str(step))
             
