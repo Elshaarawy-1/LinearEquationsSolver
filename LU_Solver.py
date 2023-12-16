@@ -2,12 +2,13 @@ from mpmath import mp, matrix, zeros
 
 class LUSolverBase:
     def __init__(self, A):
-        mp.dps = 6
+        mp.dps = 5
         self.N = A.rows
         self.A = A
         self.b = None
         self.L = zeros(self.N, self.N)
         self.U = zeros(self.N, self.N)
+        self.steps = []
 
     def solve(self, b):
         self.b = b
@@ -15,11 +16,12 @@ class LUSolverBase:
         self.decomposition()
         self.solve_for_lower()
         self.solve_for_upper()
-        return self.b
+        return self.steps
 
     def initialize_A_pivot(self):
         for i in range(self.N):
             self.partial_pivot(i)
+        self.steps.append(("Initialize A Pivot", self.A.copy()))
 
     def partial_pivot(self, k):
         pivot_row = max(range(k, self.N), key=lambda i: abs(self.A[i, k]))
@@ -35,15 +37,15 @@ class LUSolverBase:
     def solve_for_upper(self):
         for i in range(self.N-1, -1, -1):
             self.b[i] = (self.b[i] - sum(self.U[i, k] * self.b[k] for k in range(i + 1, self.N))) / self.U[i, i]
-
+        self.steps.append(("Solve for Upper", self.b.copy()))
 
     def solve_for_lower(self):
         for i in range(self.N):
             self.b[i] = (self.b[i] - sum(self.L[i, k] * self.b[k] for k in range(i))) / self.L[i, i]
+        self.steps.append(("Solve for Lower", self.b.copy()))
 
     def decomposition(self):
         raise NotImplementedError
-    
 
 class LUCholeskySolver(LUSolverBase):
     def decomposition(self):
@@ -56,6 +58,7 @@ class LUCholeskySolver(LUSolverBase):
                         self.L[i, i] = (self.A[i, i] - sum_val) ** 0.5
                     else:
                         self.L[j, i] = (self.A[j, i] - sum_val) / self.L[i, i]
+                self.steps.append((f"Step {i+1}", self.L.copy()))
             self.U = self.L.copy()
         else:
             print("Matrix A is not symmetric, and therefore, the Cholesky decomposition cannot be applied to it.")
@@ -79,6 +82,7 @@ class LUDoolittleSolver(LUSolverBase):
                 else:
                     sum_val = sum(self.L[j, k] * self.U[k, i] for k in range(i))
                     self.L[j, i] = (self.A[j, i] - sum_val) / self.U[i, i]
+            self.steps.append((f"Step {i+1}", (self.L.copy(), self.U.copy())))
 
 class LUCroutSolver(LUSolverBase):
     def decomposition(self):
@@ -91,14 +95,13 @@ class LUCroutSolver(LUSolverBase):
                     self.U[i, j] = (self.A[i, j] - sum_val) / self.L[i, i]
                 sum_val = sum(self.L[j, k] * self.U[k, i] for k in range(i))
                 self.L[j, i] = (self.A[j, i] - sum_val) / self.U[i, i]
+            self.steps.append((f"Step {i+1}", (self.L.copy(), self.U.copy())))
 
 
-
-## Example Test
-A = matrix([[2, 0, 4],
-            [1, 0, -8],
-            [0, 1, 0]])
-b = matrix([5, 15.5, 15])
+A = matrix([[25, 5, 1],
+            [64, 8, 1],
+            [144, 12, 1]])
+b = matrix([106.8, 177.2, 279.2])
 
 lu_solver = LUDoolittleSolver(A.copy())
 result = lu_solver.solve(b.copy())
@@ -109,7 +112,12 @@ crout_solver = LUCroutSolver(A.copy())
 result = crout_solver.solve(b.copy())
 print("Solution:")
 print(result)
-cholesky_solver = LUCholeskySolver(A.copy())
-result = cholesky_solver.solve(b.copy())
-print("Solution:")
-print(result)
+
+# cholesky_solver = LUCholeskySolver(A.copy())
+# result = cholesky_solver.solve(b.copy())
+# print("Solution:")
+# print(result)
+
+
+
+
