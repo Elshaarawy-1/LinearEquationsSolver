@@ -2,6 +2,8 @@ from sympy import symbols, Eq, solve, sympify, linear_eq_to_matrix
 import mpmath
 from EquationSystem import EquationSystem
 import numpy as np
+from mpmath import mp, matrix
+
 class Parser:
     def get_equations(self, list_equation):
         equations = []
@@ -30,9 +32,11 @@ class Parser:
 
             # Convert equations to matrix form AX = B
             A, B = linear_eq_to_matrix(equations, symbols_used)
-            a=mpmath.matrix(A.tolist())
-            b=mpmath.matrix(B.tolist())
-            variables=symbols_used # convert to np array
+            a=matrix(A.tolist())
+            b=matrix(B.tolist())
+            variables=[]
+            for symbol in symbols_used:
+                variables.append(symbol.name) 
             if (len(variables) != len(list_equation)):
                 raise Exception("Number of equations not equal number of variables")
             return EquationSystem(a,b,variables)
