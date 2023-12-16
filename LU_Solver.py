@@ -1,17 +1,16 @@
 from mpmath import mp, matrix, zeros
 
 class LUSolverBase:
-    def __init__(self, A):
+    def __init__(self, A, b):
         mp.dps = 5
         self.N = A.rows
         self.A = A
-        self.b = None
+        self.b = b
         self.L = zeros(self.N, self.N)
         self.U = zeros(self.N, self.N)
         self.steps = []
 
-    def solve(self, b):
-        self.b = b
+    def solve(self):
         self.initialize_A_pivot()
         self.decomposition()
         self.solve_for_lower()
@@ -103,13 +102,13 @@ A = matrix([[25, 5, 1],
             [144, 12, 1]])
 b = matrix([106.8, 177.2, 279.2])
 
-lu_solver = LUDoolittleSolver(A.copy())
-result = lu_solver.solve(b.copy())
+lu_solver = LUDoolittleSolver(A.copy(), b.copy())
+result = lu_solver.solve()
 print("Solution:")
 print(result)
 
-crout_solver = LUCroutSolver(A.copy())
-result = crout_solver.solve(b.copy())
+crout_solver = LUCroutSolver(A.copy(), b.copy())
+result = crout_solver.solve()
 print("Solution:")
 print(result)
 

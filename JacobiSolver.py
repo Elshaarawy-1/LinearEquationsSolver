@@ -4,10 +4,10 @@ import mpmath as mp
 from dominant import diagonally_dominant
 
 
-class JacobiSolver(Solver):
+class JacobiSolver:
 
     def __init__(self, A, b, itr=50, tolerance=1e-10, x=None, Sf=5):
-        self.A = mp.nmatrix(A)
+        self.A = mp.matrix(A)
         self.b = mp.matrix(b)
         self.itr = itr
         self.tolerance = tolerance

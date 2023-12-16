@@ -22,7 +22,7 @@ def diagonally_dominant(array, parsed_bef):
         else:
             return array, False
 
-def convert_matrix(self, array):
+def convert_matrix(array):
         abs_matrix = np.absolute(array)
         max_indices = np.argmax(abs_matrix, axis=1)
         #Check if the matrix can be converted into diagonal diagonally dominant one
@@ -35,4 +35,4 @@ def convert_matrix(self, array):
                 array[:,[i,max_ind]] = array[:, [max_ind,i]]
                 abs_matrix[:, [i,max_ind]] = abs_matrix[:, [max_ind,i]]
 
-        return self.diagonally_dominant(array,True)
+        return diagonally_dominant(array,True)

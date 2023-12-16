@@ -1,8 +1,9 @@
 from sympy import symbols, Eq, solve, sympify, linear_eq_to_matrix,Symbol,Mul
 import numpy as np
+from EquationSystem import EquationSystem
 from mpmath import mp, matrix
 
-class Parser:
+class Parser_Letter:
     def get_equations(self, list_equation):
         equations = []
         for eqn in list_equation:
@@ -67,7 +68,7 @@ class Parser:
             b=self.matrix2list(B)
             if (len(variables) != len(list_equation)):
                 raise Exception("Number of equations not equal number of variables")
-            return a,b,variables
+            return EquationSystem(a,b,variables)
             # Solve the system of equations
             # solution = solve(equations, symbols_used)
 
