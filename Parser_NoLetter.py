@@ -1,4 +1,6 @@
 from sympy import symbols, Eq, solve, sympify, linear_eq_to_matrix
+import mpmath
+from EquationSystem import EquationSystem
 import numpy as np
 from mpmath import mp, matrix
 
@@ -37,7 +39,7 @@ class Parser:
                 variables.append(symbol.name) 
             if (len(variables) != len(list_equation)):
                 raise Exception("Number of equations not equal number of variables")
-            return a,b,variables
+            return EquationSystem(a,b,variables)
             # Solve the system of equations
             # solution = solve(equations, symbols_used)
 

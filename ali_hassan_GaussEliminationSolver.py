@@ -1,32 +1,35 @@
 from mpmath import mp, matrix
+from Solver import Solver
 
-class GaussEliminationSolver():
-    def __init__(self,sf=5):
-        self.sf = sf
-        mp.dps = self.sf
-        pass
+class GaussEliminationSolver(Solver):
 
-    def gaussian_elimination(self, A, B):
+    def solve(self):
+        augmented_matrix = self.gaussian_elimination()
+        solution = self.back_substitution(augmented_matrix)
+        return solution
+
+    def gaussian_elimination(self):
+        A,B = self.A,self.B
         augmented_matrix = matrix([[A[i, j] for j in range(A.cols)] + [B[i, 0]] for i in range(A.rows)])
         n = augmented_matrix.rows
 
-        print("Initial Augmented Matrix:")
-        print(augmented_matrix)
+        self.steps.append("Initial Augmented Matrix:")
+        self.steps.append(augmented_matrix)
 
         for i in range(n):
             max_index = max(range(i, n), key=lambda x: abs(augmented_matrix[x, i]))
 
             if i != max_index:
-                print(f"\nSwapping rows {i + 1} and {max_index + 1}:")
+                self.steps.append(f"\nSwapping rows {i + 1} and {max_index + 1}:")
                 augmented_matrix[i, :], augmented_matrix[max_index, :] = augmented_matrix[max_index, :], augmented_matrix[i, :]
-                print(augmented_matrix)
+                self.steps.append(augmented_matrix)
 
 
             for j in range(i + 1, n):
                 factor = augmented_matrix[j, i] / augmented_matrix[i, i]
-                print(f"\nRow {j + 1} = Row {j + 1} - ({factor}) * Row {i + 1}:")
+                self.steps.append(f"\nRow {j + 1} = Row {j + 1} - ({factor}) * Row {i + 1}:")
                 augmented_matrix[j, :] -= factor * augmented_matrix[i, :]
-                print(augmented_matrix)
+                self.steps.append(augmented_matrix)
 
         return augmented_matrix
 
@@ -58,5 +61,5 @@ class GaussEliminationSolver():
 
 # a = GaussEliminationSolver()
 # solution = a.back_substitution(a.gaussian_elimination(A, B))
-# print("\nSolution:")
-# print(solution)
+# self.steps.append("\nSolution:")
+# self.steps.append(solution)

@@ -1,6 +1,10 @@
 
 import dearpygui.dearpygui as dpg
 from gui.logger import CustomLogger
+from LU_Solver import LU_Solver
+from ali_hassan_GaussEliminationSolver import GaussEliminationSolver
+from Parser_NoLetter import Parser
+from mpmath import mp
 
 class SolverGUI:
     def __init__(self) -> None:
@@ -45,24 +49,25 @@ class SolverGUI:
                 dpg.add_text("Linear Equations Solver - v1.0")
                 dpg.add_text("CSE213 Numerical Analysis Project")
                 dpg.add_text("By CSED 2026 Students :\nAhmed Ayman\nAhmed Youssef\nEbrahim Alaa\nAli Hassan\nAhmed Mustafa\nMostafa Esam")
+                
     
     def create_windows(self):
         with dpg.window(tag="equations_window", label="System of Equations",pos=(0,30),autosize=True):
-            dpg.add_input_text(tag="equations",default_value="2x+4y=5\nx-8y=15.5",multiline=True,no_spaces=True,width=580)
+            dpg.add_input_text(tag="equations",default_value="2*x+4*y=5\nx-8*y=15.5",multiline=True,no_spaces=True,width=580)
 
             with dpg.group(horizontal=True):
                 dpg.add_spacer(width=423)
-                dpg.add_button(label="SOLVE",width=150)
+                dpg.add_button(label="SOLVE",width=150,callback=self.solve_cb)
                 
         with dpg.window(tag="solution_window", label="Solution",pos=(0,280),width=390,height=350):
-                dpg.add_text("x1 = 1\nx2 = 5\nx3 = 8")
+                dpg.add_text(tag="solution_text")
         
         with dpg.window(tag="steps_window",label="Steps",pos=(395,280),width=750,height=350,):
-            steps = CustomLogger(title="Steps",pos=(595,300),width=550,height=350,parent="steps_window")
+            self.steps = CustomLogger(title="Steps",pos=(595,300),width=550,height=350,parent="steps_window")
             mat = [[1,0],[5,1]]
             
-            steps.log("L matrix = "+str(mat))
-            steps.log("U matrix = "+str(mat))
+            self.steps.log("L matrix = "+str(mat))
+            self.steps.log("U matrix = "+str(mat))
         
         with dpg.window(tag="properties_window",label="Properties",pos=(595,30),autosize=True):
             dpg.add_spacer(width=545)
@@ -107,6 +112,41 @@ class SolverGUI:
         dpg.delete_item("properties_window")
         # Recreate the windows
         self.create_windows()
+    
+    def solve_cb(self,sender,app_data):
+        # get current value of equations text and split on newline
+        equations = dpg.get_value("equations").split("\n")
+        # remove empty lines
+        equations = [eqn for eqn in equations if eqn != ""]
+
+        # get current value of method combo
+        method = dpg.get_value("method")
+        
+        # get current value of scaling checkbox
+        scaling = dpg.get_value("scaling")
+        
+        # get current value of precision slider
+        precision = dpg.get_value("precision")
+        
+        mp.dps = precision
+        
+        parser = Parser()
+        system_of_equations=parser.parseEquations(equations)
+        solver = GaussEliminationSolver(system_of_equations.A,system_of_equations.B)
+        sol = solver.solve()
+        
+        i = 0
+        text = ""
+        for variable in system_of_equations.variables:
+            text += f"{variable} = {sol[i]}\n"
+            i+=1
+            
+        dpg.set_value("solution_text", text)
+        
+        for step in solver.steps:
+            self.steps.log(str(step))
+            
+        
     
     def on_stop_condition_changed(self,sender, app_data):
         selected_item = dpg.get_value(sender)

@@ -1,6 +1,7 @@
 import Solver
 import numpy as np
 import mpmath as mp
+from dominant import diagonally_dominant
 
 
 class JacobiSolver(Solver):
@@ -17,17 +18,15 @@ class JacobiSolver(Solver):
     def solve(self):
         mp.dps = self.sf # set the precision to the number of significant figures
         D = np.diag(self.A)  # D is the diagonal of A
+        diagonallyDominantMatrix,conv = diagonally_dominant(self.A, False)  
+        if conv or D.any(0): # if it converges then 
+            self.A=mp.matrix(diagonallyDominantMatrix)
+        
+        D = np.diag(self.A)  # D is the diagonal of A
         D = mp.matrix(D)
         # R is the matrix A with the diagonal elements removed
         R = self.A - np.diagflat(D)
-        R = mp.matrix(R)
-        
-        if D.any() == 0:
-            
-            # implement diagnol dominance from gauss seidel and update selef.x
-            
-            raise ValueError("A has a zero diagonal element.")
-    
+        R = mp.matrix(R)    
         # iterate through the number of iterations
         for i in range(self.itr):
             print(f"Iteration {i+1}:")
