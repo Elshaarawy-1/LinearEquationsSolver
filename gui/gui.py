@@ -2,7 +2,7 @@
 import dearpygui.dearpygui as dpg
 from gui.logger import CustomLogger
 from parser.parser_noletter import Parser
-from mpmath import mp
+from mpmath import mp, matrix
 from solvers.solver import Solver
 from solvers.solver_factory import SolverFactory
 import time
@@ -51,6 +51,20 @@ class SolverGUI:
                 dpg.add_text("CSE213 Numerical Analysis Project")
                 dpg.add_text("By CSED 2026 Students :\nAhmed Ayman\nAhmed Youssef\nEbrahim Alaa\nAli Hassan\nAhmed Mustafa\nMostafa Esam")
                 
+    def validate_initial_guess(self,initial_guess):
+        # Split the input string by commas
+        initial_guess = initial_guess.split(',')
+
+        # Convert the string elements to float
+        try:
+            initial_guess_mat = [float(num) for num in initial_guess]
+        except ValueError:
+            raise ValueError("Initial guess must be comma separated decimal numbers")
+
+        # Convert the list to a mpmath matrix
+        initial_guess_mp = matrix(initial_guess_mat)
+
+        return initial_guess_mp
     
     def create_windows(self):
         with dpg.window(tag="equations_window", label="System of Equations",pos=(0,30),autosize=True):
@@ -97,15 +111,12 @@ class SolverGUI:
                 dpg.add_combo(label = "Stopping Condition",
                         tag="stop_condition",
                         items=["Number of Iterations", "Absolute Relative Error"],
-                        default_value="Number of Iterations",
-                        callback=self.on_stop_condition_changed)
+                        default_value="Number of Iterations")
                 
                 #based on the stopping condition combo, show either a number_of_iterations input or absolute_relative_error input
                 dpg.add_input_int(label="Number of Iterations", tag="number_of_iterations",default_value=50,max_value=500,min_value=1,min_clamped=True,max_clamped=True)
                 dpg.add_input_float(label="Absolute Relative Error", tag="absolute_relative_error",default_value=0.001,step=0.001,format="%.6f",min_value=0.000001,min_clamped=True)
 
-                # Initially hide the absolute_relative_error input
-                dpg.configure_item("absolute_relative_error", show=False)
 
     def reset_gui(self,sender, app_data):
         # Destroy all existing windows
@@ -139,6 +150,12 @@ class SolverGUI:
             print(system_of_equations.A)
             start_time = time.perf_counter()
             solver = SolverFactory(system_of_equations.A, system_of_equations.B).get_solver(method)
+            if method in ["Gauss-Seidel", "Jacobi-Iteration"]:
+                solver.itr = dpg.get_value("number_of_iterations")
+                solver.tolerance = dpg.get_value("absolute_relative_error")
+                init_guess_str = dpg.get_value("initial_guess")
+                initial_guess = self.validate_initial_guess(init_guess_str)
+                solver.x = initial_guess
             sol = solver.solve()
             
             end_time = time.perf_counter()
@@ -161,15 +178,6 @@ class SolverGUI:
             print(f"An error occurred: {e}")
             dpg.set_value("solution_text", "Can't Solve")
         
-    
-    def on_stop_condition_changed(self,sender, app_data):
-        selected_item = dpg.get_value(sender)
-        if selected_item == "Number of Iterations":
-            dpg.configure_item("number_of_iterations", show=True)
-            dpg.configure_item("absolute_relative_error", show=False)
-        elif selected_item == "Absolute Relative Error":
-            dpg.configure_item("number_of_iterations", show=False)
-            dpg.configure_item("absolute_relative_error", show=True)
 
     def on_method_changed(self, sender, app_data):
         selected_method = dpg.get_value(sender)

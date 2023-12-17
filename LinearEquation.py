@@ -5,7 +5,7 @@ from solvers.lu_solver import *
 from parser.EquationSystem import *
 import numpy as np
 from mpmath import mp
-from GaussSeidelSolver import *
+from solvers.gauss_seidel_solver import *
 equations = input() # get from GUI
 
 list_equation = equations.split(",")

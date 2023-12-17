@@ -1,20 +1,20 @@
 import numpy as np
 from sympy import symbols, pprint, Add, Mul, Eq
 import mpmath
-import dominant
+from solvers.solver import Solver
+import solvers.dominant as dominant
 
-class GaussSeidelSolver():
-    def __init__(self, matrix, soln, itr=50,tol=1e-10,x=None, sf = 5):
-        self.matrix = matrix
-        self.soln = soln
+class GaussSeidelSolver(Solver):
+    def __init__(self, A, B, itr=50,tolerance=1e-10,x=None):
+        self.matrix = A
+        self.soln = B
         self.itr = itr
-        self.tol = tol
+        self.tolerance = tolerance
         self.x = x
-        self.sf = sf
+        self.steps = []
 
 
     def solve(self):
-        mpmath.mp.dps = self.sf
         mpmath.mp.pretty = True
         x_prev = mpmath.matrix(self.x)
         row = self.matrix.rows
@@ -32,11 +32,11 @@ class GaussSeidelSolver():
         if diagonal.any() == 0:
             raise ZeroDivisionError("Matrix has a zero diagonal element")
         print(self.matrix)
-        steps = f"Initial Guess:\n{self.x}\n"
+        self.steps.append(f"Initial Guess:\n{self.x.copy()}\n")
         i = 0
         while True:
             i += 1
-            steps += f"\n_________________ iteration {i} _________________\n"
+            self.steps.append(f"\n_________________ iteration {i} _________________\n")
             for j in range(row):
                 self.x[j] = self.soln[j]
                 for k in range(row):
@@ -44,15 +44,18 @@ class GaussSeidelSolver():
                         self.x[j] -= (self.matrix[j,k] * self.x[k])
                 self.x[j] /= diagonal[j]
 
-            steps += f"Solution for iteration {i}: \n{self.x}\n"
+            self.steps.append(f"Solution for iteration {i}: \n{self.x.copy()}\n")
             err = np.absolute(self.x - x_prev)/self.x * 100
-            steps += f"Error for Iteration {i}: {err}\n"
+            self.steps.append(f"Error for Iteration {i}: {err}\n")
             x_prev = self.x.copy()
-            if np.all(err<self.tol):
+            if np.all(err<self.tolerance):
+                self.steps.append(f"\nConverged after {i} iterations.")
                 break
             if i >= self.itr:
+                self.steps.append(f"\nFinished {i} iterations.")
                 break
-        return self.x, steps
+            
+        return self.x
     
 
 if __name__ == '__main__':

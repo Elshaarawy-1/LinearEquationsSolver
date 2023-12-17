@@ -1,19 +1,18 @@
-import Solver
+from solvers.solver import Solver
 import numpy as np
 import mpmath as mp
-from dominant import diagonally_dominant
+from solvers.dominant import diagonally_dominant
 
 
-class JacobiSolver:
+class JacobiSolver(Solver):
 
-    def __init__(self, A, b, itr=3, tolerance=1e-10, x=None, Sf=2):
+    def __init__(self, A, B, itr=3, tolerance=1e-10, x=None):
         self.A = A
         self.AD = np.array(A)
-        self.b = b
+        self.b = B
         self.itr = itr
         self.tolerance = tolerance
-        self.x = mp.matrix(x)
-        self.sf = Sf
+        self.x = x
         self.steps=[]
         
         pass
@@ -21,7 +20,6 @@ class JacobiSolver:
     
     
     def solve(self): # function to solve the system of equations
-        mp.dps = self.sf # set the precision
         
         
         # if self.check_zero_diagonal(D):
