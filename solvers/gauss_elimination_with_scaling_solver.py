@@ -5,15 +5,17 @@
 
 from mpmath import mp, matrix
 import numpy as np
+from solvers.solver import Solver
 
-
-class GaussEliminationSolver:
-    def __init__(self, A, B, sf=5):
-        self.sf = sf
-        mp.dps = self.sf
-        self.n= A.rows
-        self.A = mp.matrix(A)
-        self.B = mp.matrix(B)
+class GaussEliminationWithScalingSolver(Solver):
+    def __init__(self,A,B):
+        super().__init__(A,B)
+        self.n= self.A.rows
+        
+    def solve(self):
+        augmented_matrix = self.gaussian_elimination()
+        solution = self.back_substitution(augmented_matrix)
+        return solution
 
     def scaling(self):
         scaling_factors = mp.matrix([0] * self.n)
@@ -26,8 +28,8 @@ class GaussEliminationSolver:
             [[self.A[i, j] for j in range(self.A.cols)] + [self.B[i, 0]] for i in range(self.A.rows)])
         n = augmented_matrix.rows
 
-        print("Initial Augmented Matrix:")
-        print(augmented_matrix)
+        self.steps.append("Initial Augmented Matrix:")
+        self.steps.append(augmented_matrix.copy())
 
         scaling_factors = self.scaling()
 
@@ -36,17 +38,17 @@ class GaussEliminationSolver:
                 augmented_matrix[x, i] / scaling_factors[x]))
 
             if i != max_index:
-                print(f"\nSwapping rows {i + 1} and {max_index + 1}:")
+                self.steps.append(f"\nSwapping rows {i + 1} and {max_index + 1}:")
                 augmented_matrix[i, :], augmented_matrix[max_index,
                                                          :] = augmented_matrix[max_index, :], augmented_matrix[i, :]
-                print(augmented_matrix)
+                self.steps.append(augmented_matrix.copy())
 
             for j in range(i + 1, n):
                 factor = augmented_matrix[j, i] / augmented_matrix[i, i]
-                print(
+                self.steps.append(
                     f"\nRow {j + 1} = Row {j + 1} - ({factor}) * Row {i + 1}:")
                 augmented_matrix[j, :] -= factor * augmented_matrix[i, :]
-                print(augmented_matrix)
+                self.steps.append(augmented_matrix.copy())
 
         return augmented_matrix
 
@@ -66,18 +68,18 @@ class GaussEliminationSolver:
         return solution
 
 
-# Example usage:
-A = matrix([[-8, 1, -2],
-            [-3, -1, 7],
-            [2, -6, 1]])
+# # Example usage:
+# A = matrix([[-8, 1, -2],
+#             [-3, -1, 7],
+#             [2, -6, 1]])
 
-B = matrix([[106.8],
-            [177.2],
-            [279.2]])
+# B = matrix([[106.8],
+#             [177.2],
+#             [279.2]])
 
-solver = GaussEliminationSolver(A, B)
-augmented_matrix = solver.gaussian_elimination()
-solution = solver.back_substitution(augmented_matrix)
+# solver = GaussEliminationSolver(A, B)
+# augmented_matrix = solver.gaussian_elimination()
+# solution = solver.back_substitution(augmented_matrix)
 
-print("\nSolution:")
-print(solution)
+# self.steps.append("\nSolution:")
+# self.steps.append(solution)

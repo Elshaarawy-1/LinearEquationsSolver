@@ -37,7 +37,7 @@ class JacobiSolver:
         D=mp.matrix(D)
         
         for i in range(self.itr):
-            print(f"Iteration {i+1}:")
+            self.steps.append(f"Iteration {i+1}:")
             x_old = mp.matrix(self.x.copy())  # copy the old values of x
             for itr in range(len(self.x)):
                 # dot_product = round_to_sf(sum(round_to_sf(R[itr, j] * x_old[j],sf) for j in range(len(x_old))),sf)

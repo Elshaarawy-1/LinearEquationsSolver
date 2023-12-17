@@ -5,6 +5,7 @@ from parser.parser_noletter import Parser
 from mpmath import mp
 from solvers.solver import Solver
 from solvers.solver_factory import SolverFactory
+import time
 
 class SolverGUI:
     def __init__(self) -> None:
@@ -101,7 +102,7 @@ class SolverGUI:
                 
                 #based on the stopping condition combo, show either a number_of_iterations input or absolute_relative_error input
                 dpg.add_input_int(label="Number of Iterations", tag="number_of_iterations",default_value=50,max_value=500,min_value=1,min_clamped=True,max_clamped=True)
-                dpg.add_input_float(label="Absolute Relative Error", tag="absolute_relative_error",default_value=0.0001,format="%.6f",min_value=0.000001,min_clamped=True)
+                dpg.add_input_float(label="Absolute Relative Error", tag="absolute_relative_error",default_value=0.001,step=0.001,format="%.6f",min_value=0.000001,min_clamped=True)
 
                 # Initially hide the absolute_relative_error input
                 dpg.configure_item("absolute_relative_error", show=False)
@@ -110,41 +111,55 @@ class SolverGUI:
         # Destroy all existing windows
         dpg.delete_item("equations_window")
         dpg.delete_item("properties_window")
+        dpg.delete_item("solution_window")
+        dpg.delete_item("steps_window")
         # Recreate the windows
         self.create_windows()
     
     def solve_cb(self,sender,app_data):
-        # get current value of equations text and split on newline
-        equations = dpg.get_value("equations").split("\n")
-        
-        # remove empty lines
-        equations = [eqn for eqn in equations if eqn != ""]
+        try:
+            # get current value of equations text and split on newline
+            equations = dpg.get_value("equations").split("\n")
+            
+            # remove empty lines
+            equations = [eqn for eqn in equations if eqn != ""]
 
-        method = dpg.get_value("method")
-        scaling = dpg.get_value("scaling")
-        precision = dpg.get_value("precision")
-        
-        mp.dps = precision
-        
-        parser = Parser()
-        system_of_equations=parser.parseEquations(equations)
-        
-        solver = SolverFactory(system_of_equations.A, system_of_equations.B).get_solver(method)
-        sol = solver.solve()
-        
-        i = 0
-        text = ""
-        for variable in system_of_equations.variables:
-            text += f"{variable} = {sol[i]}\n"
-            i+=1
+            method = dpg.get_value("method")
+            if method == "Gauss Elimination" and dpg.get_value("scaling"):
+                method += " With Scaling"
+            elif method == "LU Decomposition":
+                method += " " + dpg.get_value("lu_format")
+                
+            precision = dpg.get_value("precision")
+            mp.dps = precision
             
-        dpg.set_value("solution_text", text)
-        
-        
-        self.steps.clear_log()
-        for step in solver.steps:
-            self.steps.log(str(step))
             
+            parser = Parser()
+            system_of_equations=parser.parseEquations(equations)
+            print(system_of_equations.A)
+            start_time = time.perf_counter()
+            solver = SolverFactory(system_of_equations.A, system_of_equations.B).get_solver(method)
+            sol = solver.solve()
+            
+            end_time = time.perf_counter()
+            runtime = end_time - start_time
+            
+            i = 0
+            text = f"Runtime is {runtime:.8f} seconds\n"
+            for variable in system_of_equations.variables:
+                text += f"{variable} = {sol[i]}\n"
+                i+=1
+
+            
+            dpg.set_value("solution_text", text)
+            
+            
+            self.steps.clear_log()
+            for step in solver.steps:
+                self.steps.log(str(step))
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            dpg.set_value("solution_text", "Can't Solve")
         
     
     def on_stop_condition_changed(self,sender, app_data):
@@ -158,7 +173,7 @@ class SolverGUI:
 
     def on_method_changed(self, sender, app_data):
         selected_method = dpg.get_value(sender)
-        if selected_method in ["Gauss Elimination", "Gauss-Jordan", "LU Decomposition"]:
+        if selected_method == "Gauss Elimination":
             dpg.configure_item("scaling", show=True)
         else:
             dpg.configure_item("scaling", show=False)
