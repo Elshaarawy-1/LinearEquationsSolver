@@ -1,8 +1,7 @@
 import numpy as np
 from sympy import symbols, pprint, Add, Mul, Eq
 import mpmath
-import Solver
-from dominant import diagonally_dominant
+import dominant
 
 class GaussSeidelSolver():
     def __init__(self, matrix, soln, itr=50,tol=1e-10,x=None, sf = 5):
@@ -23,47 +22,47 @@ class GaussSeidelSolver():
         if row != col:
             raise ValueError("Matrix is not square")
 
+        x_order = np.arange(row)
         #Check diagonally dominant
-        self.matrix, converge = diagonally_dominant(self.matrix, False)
+        array, converge = dominant.diagonally_dominant(np.array(self.matrix.copy().tolist()), x_order,False)
+        print(self.matrix)
+        print(x_order)
+        self.matrix = mpmath.matrix(array)
         diagonal = np.diag(np.array(self.matrix.tolist()))
-        
-        print(f"convergence: {converge}")
-        print(f"Initial Guess:\n{self.x}")
+        if diagonal.any() == 0:
+            raise ZeroDivisionError("Matrix has a zero diagonal element")
+        print(self.matrix)
+        steps = f"Initial Guess:\n{self.x}\n"
         i = 0
         while True:
             i += 1
-            print(f"\n_________________ iteration {i} _________________\n")
+            steps += f"\n_________________ iteration {i} _________________\n"
             for j in range(row):
-                x_symb = symbols('x_{}^{}'.format(j+1, i))
-                x_expr = self.soln[j]
                 self.x[j] = self.soln[j]
                 for k in range(row):
                     if k != j:
                         self.x[j] -= (self.matrix[j,k] * self.x[k])
-                        x_expr = x_expr - Mul(self.matrix[j,k],self.x[k])
                 self.x[j] /= diagonal[j]
-                x_expr = x_expr/diagonal[j]
-                x_expr = Eq(x_symb, x_expr)
-                pprint(x_expr)
 
-            print(f"Solution for iteration {i}: \n{self.x}\n")
+            steps += f"Solution for iteration {i}: \n{self.x}\n"
             err = np.absolute(self.x - x_prev)/self.x * 100
-            print(f"Error for Iteration {i}: {err}")
+            steps += f"Error for Iteration {i}: {err}\n"
             x_prev = self.x.copy()
             if np.all(err<self.tol):
                 break
             if i >= self.itr:
                 break
-        return self.x
-
-
- 
+        return self.x, steps
+    
 
 if __name__ == '__main__':
-    matrix = mpmath.matrix([[4,2,1],[-1,2,0],[2,1,4]])
-    soln = mpmath.matrix([11,3,16])
+    matrix = mpmath.matrix([[12, 3, -5],
+             [1,5, 3],
+             [3, 7, 13]])
+    soln = mpmath.matrix([1,28,76])
 
-    solver = GaussSeidelSolver(matrix, soln, itr=4,
-                               x=mpmath.matrix([1,1,1]), sf = 5)
-    solution = solver.solve()
-    print("\nFinal Solution:\n",solution)
+    solver = GaussSeidelSolver(matrix, soln, itr=7,
+                               x=mpmath.matrix([1,0,1]), sf = 5)
+    solution, step_by_step = solver.solve()
+    print(f"\nFinal Solution:\n{solution}")
+    print("\nStep by step soln\n", step_by_step)
