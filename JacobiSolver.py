@@ -14,6 +14,7 @@ class JacobiSolver:
         self.tolerance = tolerance
         self.x = mp.matrix(x)
         self.sf = Sf
+        self.steps=[]
         
         pass
         
@@ -43,10 +44,9 @@ class JacobiSolver:
                 dot_product = mp.mpf(self.matrixSumofProduct(R, x_old, itr)) # calculate the sum of the product of R and x_old
                 self.x[itr] = mp.mpf(mp.mpf(self.b[itr] - dot_product) / D[itr, itr]) # calculate the new x
                 abs_rel_error = mp.mpf(np.abs((self.x[itr] - x_old[itr]) / self.x[itr]))  # calculate the absolute relative error for each x
-                print(
-                    f"x{itr} = {self.x[itr]} and Absolute relative error: {abs_rel_error}") # print the new x and the absolute relative error
+                self.steps.append(f"x{itr} = {self.x[itr]} and Absolute relative error: {abs_rel_error}") # print the new x and the absolute relative error
             if np.all(abs_rel_error < self.tolerance):
-                print(f"\nConverged after {i + 1} iterations.")
+                self.steps.append(f"\nConverged after {i + 1} iterations.")
                 break
 
         return self.x
