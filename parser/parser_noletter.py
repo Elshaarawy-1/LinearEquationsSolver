@@ -1,6 +1,6 @@
 from sympy import symbols, Eq, solve, sympify, linear_eq_to_matrix
 import mpmath
-from EquationSystem import EquationSystem
+from parser.EquationSystem import EquationSystem
 import numpy as np
 from mpmath import mp, matrix
 

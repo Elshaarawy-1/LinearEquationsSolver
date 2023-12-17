@@ -4,7 +4,7 @@ import mpmath as mp
 from dominant import diagonally_dominant
 
 
-class JacobiSolver(Solver):
+class JacobiSolver:
 
     def __init__(self, A, b, itr=3, tolerance=1e-10, x=None, Sf=2):
         self.A = A
