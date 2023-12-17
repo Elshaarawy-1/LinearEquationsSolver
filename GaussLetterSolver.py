@@ -28,7 +28,7 @@ class GaussianLetter:
         print("\nSymPy Matrix with Symbols:\n")
         sp.pprint(reduced_matrix)
 
-        self.back_substitution(reduced_matrix, self.soln)
+        return self.back_substitution(reduced_matrix, self.soln)
 
 
     def back_substitution(self, matrix, soln):

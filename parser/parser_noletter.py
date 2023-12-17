@@ -39,7 +39,12 @@ class Parser:
 
         return symbols_list
 
-    
+    def checkDeterminant(self, matrixA):
+        coefficients=np.array(matrixA)
+        det=np.linalg.det(coefficients)
+        if det==0:
+            return False
+        return True
     def parseEquations(self, list_equation):
         try:
             # Get equations as string inputs from the terminal
@@ -52,12 +57,15 @@ class Parser:
                 symbols_used.append(symbols(char))
             # Convert equations to matrix form AX = B
             A, B = linear_eq_to_matrix(equations, symbols_used)
-            a=matrix(A.tolist())
+            a_list = A.tolist()
+            a=matrix(a_list)
             
             b=matrix(B.tolist())
 
             if (len(variables) != len(list_equation)):
                 raise Exception("Number of equations not equal number of variables")
+            if(not self.checkDeterminant(a_list)):
+                raise Exception("Equation does not have a unique solution.")               
             return EquationSystem(a,b,variables)
             # Solve the system of equations
             # solution = solve(equations, symbols_used)
