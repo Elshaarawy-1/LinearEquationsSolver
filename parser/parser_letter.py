@@ -15,8 +15,28 @@ class Parser_Letter:
 
         return equations
     
+    def extract_all_symbols(self, list_equation):
+        # Initialize an empty list to store unique symbols in order
+        symbols_list = []
+
+        # Use a set to check for duplicates
+        seen_symbols = set()
+
+        # Iterate over each equation in the list
+        for equation_str in list_equation:
+            # Extract letters from the equation string
+            for char in equation_str:
+                if char.isalpha() and char not in seen_symbols:
+                    seen_symbols.add(char)
+                    symbols_list.append(char)
+
+        return symbols_list
     def getSymbols(self, equations, list_equation):
-        symbols_used = list(set().union(*(eq.free_symbols for eq in equations)))
+
+        all_variables = self.extract_all_symbols(list_equation)
+        symbols_used = []
+        for char in all_variables:
+            symbols_used.append(symbols(char))
         symbols_to_remove = []  # Create a list to store symbols to be removed
 
         for equation in list_equation:
