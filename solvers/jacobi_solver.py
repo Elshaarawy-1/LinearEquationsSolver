@@ -35,16 +35,19 @@ class JacobiSolver(Solver):
         D=mp.matrix(D)
         
         for i in range(self.itr):
-            self.steps.append(f"Iteration {i+1}:")
+            print(f"Iteration {i+1}:")
             x_old = mp.matrix(self.x.copy())  # copy the old values of x
             for itr in range(len(self.x)):
                 # dot_product = round_to_sf(sum(round_to_sf(R[itr, j] * x_old[j],sf) for j in range(len(x_old))),sf)
                 dot_product = mp.mpf(self.matrixSumofProduct(R, x_old, itr)) # calculate the sum of the product of R and x_old
                 self.x[itr] = mp.mpf(mp.mpf(self.b[itr] - dot_product) / D[itr, itr]) # calculate the new x
-                abs_rel_error = mp.mpf(np.abs((self.x[itr] - x_old[itr]) / self.x[itr]))  # calculate the absolute relative error for each x
-                self.steps.append(f"x{itr} = {self.x[itr]} and Absolute relative error: {abs_rel_error}") # print the new x and the absolute relative error
-            if np.all(abs_rel_error < self.tolerance):
-                self.steps.append(f"\nConverged after {i + 1} iterations.")
+                abs_rel_error = (np.abs((self.x[itr] - x_old[itr]) / self.x[itr]))  # calculate the absolute relative error for each x
+                print(
+                    f"x{itr} = {self.x[itr]} and Absolute relative error: {abs_rel_error}") # print the new x and the absolute relative error
+            
+            err = np.absolute((np.array(self.x.tolist()) - np.array(x_old.tolist())) / np.array(self.x.tolist()))
+            if np.all(err < self.tolerance):
+                print(f"\nConverged after {i + 1} iterations.")
                 break
 
         return self.x
