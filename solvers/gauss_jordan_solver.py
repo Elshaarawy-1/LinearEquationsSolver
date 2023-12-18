@@ -24,17 +24,19 @@ class GaussJordanSolver(Solver):
                 augmented_matrix[i, :], augmented_matrix[max_index, :] = augmented_matrix[max_index, :], augmented_matrix[i, :]
                 self.steps.append(augmented_matrix.copy())
 
-            pivot = augmented_matrix[i, i]
-            augmented_matrix[i, :] /= pivot
-            self.steps.append(f"\nRow {i + 1} /= {pivot}:")
-            self.steps.append(augmented_matrix.copy())
+            if augmented_matrix[i,i] != 1:
+                pivot = augmented_matrix[i, i]
+                augmented_matrix[i, :] /= pivot
+                self.steps.append(f"\nRow {i + 1} /= {pivot}:")
+                self.steps.append(augmented_matrix.copy())
 
             for j in range(n):
                 if i != j:
-                    multiplier = augmented_matrix[j, i]
-                    augmented_matrix[j, :] -= multiplier * augmented_matrix[i, :]
-                    self.steps.append(f"\nRow {j + 1} -= {multiplier} * Row {i + 1}:")
-                    self.steps.append(augmented_matrix.copy())
+                    if augmented_matrix[j,i]!=0:
+                        multiplier = augmented_matrix[j, i]
+                        augmented_matrix[j, :] -= multiplier * augmented_matrix[i, :]
+                        self.steps.append(f"\nRow {j + 1} -= {multiplier} * Row {i + 1}:")
+                        self.steps.append(augmented_matrix.copy())
 
         return augmented_matrix
 
