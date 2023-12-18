@@ -22,13 +22,6 @@ class JacobiSolver(Solver):
     def solve(self): # function to solve the system of equations
         
         
-        # if self.check_zero_diagonal(D):
-        #     self.A,check= diagonally_dominant(self.A, False)
-        #     self.A=mp.matrix(self.A)
-        #     R,D = self.matrixwithoutDiagonal(self.A) # R is the matrix without the diagonal
-        
-        
-        # iterate through the number of iterations
         
         R,D = self.matrixwithoutDiagonal(self.A) # R is the matrix without the diagonal 
         R=mp.matrix(R)
@@ -70,19 +63,3 @@ class JacobiSolver(Solver):
         return False
 
     
-    
-    
-# # Example usage:
-
-# A = mp.matrix([[5, -1, 1],
-#             [2, 8, -1],
-#             [-1, 1, 4]])
-# B = mp.matrix([10, 11, 3])
-    
-# x = mp.matrix([[0],
-#             [0],
-#             [0]])
-# x= (JacobiSolver(A, B, x=x).solve())
-
-
-# print(x)   

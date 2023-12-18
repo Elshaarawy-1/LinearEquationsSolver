@@ -68,18 +68,3 @@ class GaussEliminationWithScalingSolver(Solver):
         return solution
 
 
-# # Example usage:
-# A = matrix([[-8, 1, -2],
-#             [-3, -1, 7],
-#             [2, -6, 1]])
-
-# B = matrix([[106.8],
-#             [177.2],
-#             [279.2]])
-
-# solver = GaussEliminationSolver(A, B)
-# augmented_matrix = solver.gaussian_elimination()
-# solution = solver.back_substitution(augmented_matrix)
-
-# self.steps.append("\nSolution:")
-# self.steps.append(solution)
