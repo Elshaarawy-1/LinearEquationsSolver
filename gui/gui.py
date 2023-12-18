@@ -198,7 +198,7 @@ class SolverGUI:
             dpg.configure_item("letter_coefficients", show=True)
         else:
             dpg.configure_item("scaling", show=False)
-            dpg.configure_item("letter_coefficients", show=True)
+            dpg.configure_item("letter_coefficients", show=False)
             
         if selected_method == "LU Decomposition":
             dpg.configure_item("lu_settings", show=True)
