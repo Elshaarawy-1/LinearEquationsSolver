@@ -2,9 +2,10 @@ import sympy as sp
 import numpy as np
 
 class GaussianLetter:
-    def __init__(self, matrix, soln):
-        self.matrix = matrix
-        self.soln = soln
+    def __init__(self, A, B):
+        self.matrix = A
+        self.soln = B
+        self.steps = []
         
 
     def solve(self):
