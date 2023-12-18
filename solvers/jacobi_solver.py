@@ -47,6 +47,8 @@ class JacobiSolver(Solver):
             if np.all(err < self.tolerance):
                 self.steps.append(f"\nConverged after {i + 1} iterations.")
                 break
+            if i == self.itr - 1:
+                self.steps.append(f"\nDid not converge after {i + 1} iterations.")
 
         return self.x
         pass

@@ -26,10 +26,11 @@ class GaussEliminationSolver(Solver):
 
 
             for j in range(i + 1, n):
-                factor = augmented_matrix[j, i] / augmented_matrix[i, i]
-                self.steps.append(f"\nRow {j + 1} = Row {j + 1} - ({factor}) * Row {i + 1}:")
-                augmented_matrix[j, :] -= factor * augmented_matrix[i, :]
-                self.steps.append(augmented_matrix.copy())
+                if augmented_matrix[j,i]!=0:
+                    factor = augmented_matrix[j, i] / augmented_matrix[i, i]
+                    self.steps.append(f"\nRow {j + 1} = Row {j + 1} - ({factor}) * Row {i + 1}:")
+                    augmented_matrix[j, :] -= factor * augmented_matrix[i, :]
+                    self.steps.append(augmented_matrix.copy())
 
         return augmented_matrix
 
