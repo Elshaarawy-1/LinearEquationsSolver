@@ -2,6 +2,7 @@
 import dearpygui.dearpygui as dpg
 from gui.logger import CustomLogger
 from parser.parser_noletter import Parser
+from parser.parser_letter import Parser_Letter
 from mpmath import mp, matrix
 from solvers.solver import Solver
 from solvers.solver_factory import SolverFactory
@@ -51,6 +52,14 @@ class SolverGUI:
                 dpg.add_text("CSE213 Numerical Analysis Project")
                 dpg.add_text("By CSED 2026 Students :\nAhmed Ayman\nAhmed Youssef\nEbrahim Alaa\nAli Hassan\nAhmed Mustafa\nMostafa Esam")
                 
+    def on_scaling_changed(self, sender, app_data):
+        if dpg.get_value("scaling"):
+            dpg.set_value("letter_coefficients", False)
+
+    def on_letter_coefficients_changed(self, sender, app_data):
+        if dpg.get_value("letter_coefficients"):
+            dpg.set_value("scaling", False)
+                
     def validate_initial_guess(self,initial_guess):
         # Split the input string by commas
         initial_guess = initial_guess.split(',')
@@ -80,13 +89,12 @@ class SolverGUI:
         with dpg.window(tag="steps_window",label="Steps",pos=(395,280),width=750,height=350,):
             self.steps = CustomLogger(title="Steps",pos=(595,300),width=550,height=350,parent="steps_window")
             mat = [[1,0],[5,1]]
-            
-            self.steps.log("L matrix = "+str(mat))
-            self.steps.log("U matrix = "+str(mat))
         
         with dpg.window(tag="properties_window",label="Properties",pos=(595,30),autosize=True):
             dpg.add_spacer(width=545)
-            dpg.add_checkbox(label="Scaling", tag="scaling")
+            dpg.add_checkbox(label="Scaling", tag="scaling", callback=self.on_scaling_changed)
+            dpg.add_checkbox(label="Letter Coefficients", tag="letter_coefficients", callback=self.on_letter_coefficients_changed)
+    
             dpg.add_slider_int(tag="precision",label="Precision",default_value=16,min_value=1,max_value=50)
             dpg.add_combo(label = "Method",
                         tag="method",
@@ -134,10 +142,14 @@ class SolverGUI:
             
             # remove empty lines
             equations = [eqn for eqn in equations if eqn != ""]
-
+            parser = Parser()
             method = dpg.get_value("method")
-            if method == "Gauss Elimination" and dpg.get_value("scaling"):
-                method += " With Scaling"
+            if method == "Gauss Elimination":
+                if dpg.get_value("scaling"):
+                    method += " With Scaling"
+                elif dpg.get_value("letter_coefficients"):
+                    method += " With Letter Coefficients"
+                    parser = Parser_Letter()
             elif method == "LU Decomposition":
                 method += " " + dpg.get_value("lu_format")
                 
@@ -145,7 +157,7 @@ class SolverGUI:
             mp.dps = precision
             
             
-            parser = Parser()
+            
             system_of_equations=parser.parseEquations(equations)
             print(system_of_equations.A)
             start_time = time.perf_counter()
@@ -183,8 +195,10 @@ class SolverGUI:
         selected_method = dpg.get_value(sender)
         if selected_method == "Gauss Elimination":
             dpg.configure_item("scaling", show=True)
+            dpg.configure_item("letter_coefficients", show=True)
         else:
             dpg.configure_item("scaling", show=False)
+            dpg.configure_item("letter_coefficients", show=False)
             
         if selected_method == "LU Decomposition":
             dpg.configure_item("lu_settings", show=True)

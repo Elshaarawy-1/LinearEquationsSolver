@@ -4,7 +4,7 @@ from parser.EquationSystem import EquationSystem
 from parser.parser_letter import Parser_Letter
 import numpy as np
 from mpmath import mp, matrix
-from GaussLetterSolver import GaussianLetter
+from solvers.gauss_with_letter_solver import GaussianLetter
 
 if __name__ == '__main__':
     print("enter equations: ")
