@@ -25,13 +25,13 @@ class GaussSeidelSolver(Solver):
         x_order = np.arange(row)
         #Check diagonally dominant
         array, converge = dominant.diagonally_dominant(np.array(self.matrix.copy().tolist()), x_order,False)
-        print(self.matrix)
-        print(x_order)
+        #print(self.matrix)
+        #print(x_order)
         self.matrix = mpmath.matrix(array)
         diagonal = np.diag(np.array(self.matrix.tolist()))
         if diagonal.any() == 0:
             raise ZeroDivisionError("Matrix has a zero diagonal element")
-        print(self.matrix)
+        #print(self.matrix)
         self.steps.append(f"Initial Guess:\n{self.x.copy()}\n")
         i = 0
         while True:
@@ -58,14 +58,14 @@ class GaussSeidelSolver(Solver):
         return self.x
     
 
-if __name__ == '__main__':
-    matrix = mpmath.matrix([[12, 3, -5],
-             [1,5, 3],
-             [3, 7, 13]])
-    soln = mpmath.matrix([1,28,76])
+#if __name__ == '__main__':
+#    matrix = mpmath.matrix([[12, 3, -5],
+#             [1,5, 3],
+#             [3, 7, 13]])
+#    soln = mpmath.matrix([1,28,76])
 
-    solver = GaussSeidelSolver(matrix, soln, itr=7,
-                               x=mpmath.matrix([1,0,1]), sf = 5)
-    solution, step_by_step = solver.solve()
-    print(f"\nFinal Solution:\n{solution}")
-    print("\nStep by step soln\n", step_by_step)
+#    solver = GaussSeidelSolver(matrix, soln, itr=7,
+#                               x=mpmath.matrix([1,0,1]), sf = 5)
+#    solution, step_by_step = solver.solve()
+#    print(f"\nFinal Solution:\n{solution}")
+#    print("\nStep by step soln\n", step_by_step)
