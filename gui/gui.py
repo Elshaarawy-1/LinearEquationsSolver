@@ -137,6 +137,7 @@ class SolverGUI:
     
     def solve_cb(self,sender,app_data):
         try:
+            dpg.set_value("solution_text", "Solving")
             # get current value of equations text and split on newline
             equations = dpg.get_value("equations").split("\n")
             
