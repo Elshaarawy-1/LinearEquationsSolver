@@ -15,7 +15,7 @@ if __name__ == "__main__":
     solver_gui.create_windows()
 
 
-    dpg.create_viewport(title='Linear Equations Solver', width=1150, height=635,x_pos=300,y_pos=300, 
+    dpg.create_viewport(title='Linear Equations Solver', width=1150, height=638,x_pos=300,y_pos=300, 
                         small_icon=r'./assets/icons/algebra.png', 
                         large_icon=r'./assets/icons/algebra.ico')
     dpg.setup_dearpygui()

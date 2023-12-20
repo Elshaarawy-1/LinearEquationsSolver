@@ -77,16 +77,16 @@ class SolverGUI:
     
     def create_windows(self):
         with dpg.window(tag="equations_window", label="System of Equations",pos=(0,30),autosize=True):
-            dpg.add_input_text(tag="equations",default_value="2*x+4*y=5\nx-8*y=15.5",multiline=True,no_spaces=True,width=580)
+            dpg.add_input_text(tag="equations",default_value="2*x+4*y=5\nx-8*y=15.5",multiline=True,no_spaces=True,width=580,height=176)
 
             with dpg.group(horizontal=True):
                 dpg.add_spacer(width=423)
                 dpg.add_button(label="SOLVE",width=150,callback=self.solve_cb)
                 
-        with dpg.window(tag="solution_window", label="Solution",pos=(0,280),width=390,height=350):
+        with dpg.window(tag="solution_window", label="Solution",pos=(0,285),width=390,height=350):
                 dpg.add_text(tag="solution_text")
         
-        with dpg.window(tag="steps_window",label="Steps",pos=(395,280),width=750,height=350,):
+        with dpg.window(tag="steps_window",label="Steps",pos=(395,285),width=750,height=350,):
             self.steps = CustomLogger(title="Steps",pos=(595,300),width=550,height=350,parent="steps_window")
             mat = [[1,0],[5,1]]
         
